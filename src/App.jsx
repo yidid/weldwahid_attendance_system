@@ -2,6 +2,12 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppLayout from './components/AppLayout'
 import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import Students from './pages/Students'
+import StudentDetail from './pages/StudentDetail'
+import Classes from './pages/Classes'
+import ClassDetail from './pages/ClassDetail'
+import Attendance from './pages/Attendance'
 
 function PlaceholderPage({ title }) {
   return (
@@ -29,7 +35,7 @@ function App() {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <PlaceholderPage title="Dashboard" />
+              <Dashboard />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -40,7 +46,8 @@ function App() {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <PlaceholderPage title="Attendance" />
+              <Attendance />
+
             </AppLayout>
           </ProtectedRoute>
         }
@@ -51,7 +58,7 @@ function App() {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <PlaceholderPage title="Students" />
+              <Students />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -62,7 +69,7 @@ function App() {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <PlaceholderPage title="Student Detail" />
+              <StudentDetail />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -73,7 +80,18 @@ function App() {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <PlaceholderPage title="Classes" />
+              <Classes />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/classes/:id"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <ClassDetail />
             </AppLayout>
           </ProtectedRoute>
         }

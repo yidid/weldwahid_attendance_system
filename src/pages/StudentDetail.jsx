@@ -9,6 +9,7 @@ import {
 } from '../services/studentService'
 import { getAllClasses } from '../services/classService'
 import { getAttendanceForStudent } from '../services/attendanceService'
+import StudentQrModal from '../components/StudentQrModal'
 
 export default function StudentDetail() {
   const { id } = useParams()
@@ -20,7 +21,7 @@ export default function StudentDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notFound, setNotFound] = useState(false)
-
+const [showQrModal, setShowQrModal] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState('')
   const [studentId, setStudentId] = useState('')
@@ -128,11 +129,6 @@ export default function StudentDetail() {
     }
   }
 
-  function handleRegenerateQr() {
-    setActionMessage(
-      'QR regeneration requires the backend function, which we will connect in Step 14.'
-    )
-  }
 
   if (loading) {
     return <p className="text-slate-500">Loading student...</p>
@@ -342,11 +338,11 @@ export default function StudentDetail() {
           {student.status === 'active' ? 'Deactivate Student' : 'Activate Student'}
         </button>
 
-        <button
-          onClick={handleRegenerateQr}
+               <button
+          onClick={() => setShowQrModal(true)}
           className="px-4 py-2 rounded-md text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200"
         >
-          Regenerate QR Code
+          {student.qrTokenHash ? 'Regenerate QR Code' : 'Generate QR Code'}
         </button>
       </div>
 
@@ -393,6 +389,15 @@ export default function StudentDetail() {
             </tbody>
           </table>
         )}
+              {showQrModal && (
+        <StudentQrModal
+          student={student}
+          onClose={() => {
+            setShowQrModal(false)
+            loadData()
+          }}
+        />
+      )}       
       </div>
     </div>
   )

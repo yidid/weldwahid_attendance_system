@@ -8,6 +8,15 @@ import {
 
 const AuthContext = createContext(null)
 
+function withProfileTimeout(promise, ms = 8000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Profile fetch timed out')), ms)
+    ),
+  ])
+}
+
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null)
   const [userProfile, setUserProfile] = useState(null)
@@ -26,22 +35,26 @@ export function AuthProvider({ children }) {
       }
 
       setCurrentUser(firebaseUser)
+      setLoading(true)
 
       try {
-        const profile = await getUserProfile(firebaseUser.uid)
+        const profile = await withProfileTimeout(getUserProfile(firebaseUser.uid))
 
         if (!profile) {
+          console.warn('AuthContext: No user profile document found for uid:', firebaseUser.uid)
           setError('No profile found for this account. Contact an administrator.')
           setUserProfile(null)
         } else {
           setUserProfile(profile)
+          setError('')
         }
       } catch (err) {
+        console.error('AuthContext: Failed to load user profile:', err)
         setError('Failed to load user profile.')
         setUserProfile(null)
+      } finally {
+        setLoading(false)
       }
-
-      setLoading(false)
     })
 
     return unsubscribe
@@ -49,7 +62,14 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     setError('')
-    await loginWithEmail(email, password)
+    // Don't set loading here — the onAuthStateChanged listener
+    // will fire and manage the loading state itself.
+    try {
+      await loginWithEmail(email, password)
+      // onAuthStateChanged will handle setting loading/profile
+    } catch (error) {
+      throw error
+    }
   }
 
   async function logout() {

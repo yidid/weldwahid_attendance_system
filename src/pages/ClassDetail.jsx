@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getClassById } from '../services/classService'
 import { getAllStudents, updateStudent } from '../services/studentService'
-
+import StudentQrModal from '../components/StudentQrModal'
 export default function ClassDetail() {
   const { id } = useParams()
-
+  
   const [classItem, setClassItem] = useState(null)
   const [allStudents, setAllStudents] = useState([])
   const [loading, setLoading] = useState(true)

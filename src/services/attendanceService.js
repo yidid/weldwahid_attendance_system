@@ -5,7 +5,9 @@ import {
   getDocs,
   orderBy,
 } from 'firebase/firestore'
+import { httpsCallable } from 'firebase/functions'
 import { db } from '../firebase/firebase'
+import { functions } from '../firebase/firebase'
 
 const attendanceRef = collection(db, 'attendance')
 
@@ -31,17 +33,15 @@ export async function getAttendanceByDate(dateString) {
 }
 
 export async function getAttendanceForStudent(studentId) {
-  const q = query(
-    attendanceRef,
-    where('studentId', '==', studentId),
-    orderBy('date', 'desc')
-  )
+  const q = query(attendanceRef, where('studentId', '==', studentId))
   const snapshot = await getDocs(q)
 
-  return snapshot.docs.map((docSnap) => ({
-    id: docSnap.id,
-    ...docSnap.data(),
-  }))
+  return snapshot.docs
+    .map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    }))
+    .sort((first, second) => second.date.localeCompare(first.date))
 }
 
 export async function getAttendanceByDateRange(startDate, endDate) {
@@ -57,4 +57,16 @@ export async function getAttendanceByDateRange(startDate, endDate) {
     id: docSnap.id,
     ...docSnap.data(),
   }))
+}
+
+export async function callRecordEntry(qrText) {
+  const recordEntryFn = httpsCallable(functions, 'recordEntry')
+  const response = await recordEntryFn({ qrText })
+  return response.data
+}
+
+export async function callRecordExit(qrText) {
+  const recordExitFn = httpsCallable(functions, 'recordExit')
+  const response = await recordExitFn({ qrText })
+  return response.data
 }

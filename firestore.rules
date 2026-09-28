@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users — authenticated users can read their own profile
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Students — any authenticated user can read/write
+    match /students/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Attendance — any authenticated user can read/write
+    match /attendance/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Classes — any authenticated user can read/write
+    match /classes/{docId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

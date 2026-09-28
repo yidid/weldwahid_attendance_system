@@ -2,6 +2,15 @@ import { useEffect, useState } from 'react'
 import { getAllStudents } from '../services/studentService'
 import { getAttendanceByDate, getTodayDateString } from '../services/attendanceService'
 
+function withTimeout(promise, milliseconds) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Dashboard request timed out.')), milliseconds)
+    }),
+  ])
+}
+
 export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -23,10 +32,10 @@ export default function Dashboard() {
 
     try {
       const today = getTodayDateString()
-      const [students, todayAttendance] = await Promise.all([
-        getAllStudents(),
-        getAttendanceByDate(today),
-      ])
+      const [students, todayAttendance] = await withTimeout(
+        Promise.all([getAllStudents(), getAttendanceByDate(today)]),
+        10000,
+      )
 
       const activeStudents = students.filter((s) => s.status === 'active')
       const totalStudents = activeStudents.length
