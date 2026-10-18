@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import QrScanner from '../components/QrScanner'
 import { callRecordEntry, callRecordExit } from '../services/attendanceService'
 import { getAllClasses } from '../services/classService'
@@ -68,6 +68,7 @@ export default function Attendance() {
   const [mode, setMode] = useState('entry')
   const [scannerActive, setScannerActive] = useState(true)
   const [processing, setProcessing] = useState(false)
+  const processingRef = useRef(false)
   const [lastResult, setLastResult] = useState(null)
   const [classes, setClasses] = useState([])
   const [activeTab, setActiveTab] = useState('scanner')
@@ -76,17 +77,24 @@ export default function Attendance() {
   }, [])
 
   async function handleScan(decodedText) {
-    if (processing) return
+    if (processingRef.current) return
 
+    processingRef.current = true
     setProcessing(true)
     setScannerActive(false)
 
-    const response = await validateAndRecordAttendance(decodedText, mode, classes)
-    setLastResult(response)
-    setProcessing(false)
+    try {
+      const response = await validateAndRecordAttendance(decodedText, mode, classes)
+      setLastResult(response)
+    } finally {
+      processingRef.current = false
+      setProcessing(false)
+    }
   }
 
   function handleModeChange(newMode) {
+    if (processingRef.current) return
+
     setMode(newMode)
     setLastResult(null)
     setScannerActive(true)
@@ -94,6 +102,7 @@ export default function Attendance() {
 
   function handleScanNext() {
     setLastResult(null)
+    processingRef.current = false
     setScannerActive(true)
   }
 

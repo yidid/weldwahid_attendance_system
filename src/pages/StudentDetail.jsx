@@ -10,6 +10,7 @@ import {
 import { getAllClasses } from '../services/classService'
 import { getAttendanceForStudent } from '../services/attendanceService'
 import StudentQrModal from '../components/StudentQrModal'
+import { formatEthiopianDate } from '../utils/dateFormatting'
 
 export default function StudentDetail() {
   const { id } = useParams()
@@ -21,7 +22,7 @@ export default function StudentDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notFound, setNotFound] = useState(false)
-const [showQrModal, setShowQrModal] = useState(false)
+  const [showQrModal, setShowQrModal] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState('')
   const [studentId, setStudentId] = useState('')
@@ -32,6 +33,8 @@ const [showQrModal, setShowQrModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [actionMessage, setActionMessage] = useState('')
+  const [linkCode, setLinkCode] = useState(null)
+  const [generatingLinkCode, setGeneratingLinkCode] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -128,7 +131,22 @@ const [showQrModal, setShowQrModal] = useState(false)
       setError('Failed to update status.')
     }
   }
+async function handleGenerateLinkCode() {
+  setActionMessage('')
+  setGeneratingLinkCode(true)
 
+  try {
+    const { httpsCallable } = await import('firebase/functions')
+    const { functions } = await import('../firebase/firebase')
+    const generateLinkCodeFn = httpsCallable(functions, 'generateLinkCode')
+    const response = await generateLinkCodeFn({ studentId: id })
+    setLinkCode(response.data)
+  } catch (err) {
+    setError('Failed to generate link code.')
+  } finally {
+    setGeneratingLinkCode(false)
+  }
+}
 
   if (loading) {
     return <p className="text-slate-500">Loading student...</p>
@@ -344,7 +362,28 @@ const [showQrModal, setShowQrModal] = useState(false)
         >
           {student.qrTokenHash ? 'Regenerate QR Code' : 'Generate QR Code'}
         </button>
+                <button
+          onClick={handleGenerateLinkCode}
+          disabled={generatingLinkCode}
+          className="px-4 py-2 rounded-md text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+        >
+          {generatingLinkCode ? 'Generating...' : 'Generate Telegram Link Code'}
+        </button>
       </div>
+            {linkCode && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
+          <p className="text-sm text-slate-600 mb-1">
+            Give this code to the student to send to the Telegram bot:
+          </p>
+          <p className="text-3xl font-bold text-blue-700 tracking-widest">
+            {linkCode.code}
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            Expires in 10 minutes. Student should send:{' '}
+            <span className="font-mono">/link {linkCode.code}</span>
+          </p>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="font-semibold text-slate-800 mb-4">Attendance History</h3>
@@ -366,7 +405,7 @@ const [showQrModal, setShowQrModal] = useState(false)
             <tbody className="divide-y divide-slate-100">
               {attendanceHistory.map((record) => (
                 <tr key={record.id}>
-                  <td className="px-3 py-2">{record.date}</td>
+                  <td className="px-3 py-2">{formatEthiopianDate(record.date)}</td>
                   <td className="px-3 py-2">
                     {record.entryTime
                       ? record.entryTime.toDate().toLocaleTimeString('en-US', {

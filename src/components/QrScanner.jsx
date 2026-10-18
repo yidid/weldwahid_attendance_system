@@ -6,7 +6,13 @@ const SCANNER_ELEMENT_ID = 'qr-scanner-region'
 export default function QrScanner({ onScan, active }) {
   const scannerRef = useRef(null)
   const isRunningRef = useRef(false)
+  const onScanRef = useRef(onScan)
+  const scanHandledRef = useRef(false)
   const [cameraError, setCameraError] = useState('')
+
+  useEffect(() => {
+    onScanRef.current = onScan
+  }, [onScan])
 
   useEffect(() => {
     if (!active) {
@@ -14,6 +20,7 @@ export default function QrScanner({ onScan, active }) {
       return
     }
 
+    scanHandledRef.current = false
     startScanner()
 
     return () => {
@@ -35,7 +42,10 @@ export default function QrScanner({ onScan, active }) {
           qrbox: { width: 250, height: 250 },
         },
         (decodedText) => {
-          onScan(decodedText)
+          if (scanHandledRef.current) return
+
+          scanHandledRef.current = true
+          onScanRef.current(decodedText)
         },
         () => {
           // ignore per-frame "no QR found" errors, this fires constantly while scanning
@@ -51,6 +61,8 @@ export default function QrScanner({ onScan, active }) {
   }
 
   async function stopScanner() {
+    scanHandledRef.current = true
+
     if (scannerRef.current && isRunningRef.current) {
       try {
         await scannerRef.current.stop()

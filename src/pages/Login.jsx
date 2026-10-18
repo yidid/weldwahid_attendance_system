@@ -32,11 +32,13 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow p-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 py-8">
+      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl shadow-black/30">
+        <div className="h-2 bg-gradient-to-r from-emerald-500 via-teal-400 to-blue-500" />
+        <div className="p-6 sm:p-9">
         <div className="text-center mb-6">
-            <img src=" /weldwahid.jpg" alt="Logo" className="mx-auto mb-4 w-30 "></img>
-          <h1 className="text-xl font-bold text-green-600">መካነ ቅዱሳን ኢያቄም ወሐና ወልድ ዋህድ ሰ/ት/ቤት</h1>
+            <img src="/weldwahid.jpg" alt="Logo" className="mx-auto mb-4 h-24 w-24 rounded-2xl object-cover ring-4 ring-emerald-50" />
+          <h1 className="text-xl font-bold leading-relaxed text-slate-800">መካነ ቅዱሳን ኢያቄም ወሐና ወልድ ዋህድ ሰ/ት/ቤት</h1>
           <p className="text-sm text-slate-500">መዝሙር እና ኪነጥበብ ክፍል ሲስተም</p>
         </div>
 
@@ -49,7 +51,7 @@ export default function Login() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-100"
               autoComplete="email"
             />
           </div>
@@ -62,7 +64,7 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-100"
               autoComplete="current-password"
             />
           </div>
@@ -74,11 +76,12 @@ export default function Login() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-green-600 text-white py-2 rounded-md text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+            className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? 'Logging in...' : 'Log In'}
           </button>
         </form>
+        </div>
       </div>
     </div>
   )

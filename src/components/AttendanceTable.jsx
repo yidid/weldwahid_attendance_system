@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getAllStudents } from '../services/studentService'
 import { getAllClasses } from '../services/classService'
 import { getAttendanceByDate, getTodayDateString } from '../services/attendanceService'
+import { formatEthiopianDate } from '../utils/dateFormatting'
 
 export default function AttendanceTable() {
   const [records, setRecords] = useState([])
@@ -97,6 +98,9 @@ export default function AttendanceTable() {
           onChange={(e) => setDateFilter(e.target.value)}
           className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <span className="self-center text-sm text-slate-500">
+          {formatEthiopianDate(dateFilter)}
+        </span>
 
         <input
           type="text"

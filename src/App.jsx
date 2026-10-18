@@ -8,6 +8,8 @@ import StudentDetail from './pages/StudentDetail'
 import Classes from './pages/Classes'
 import ClassDetail from './pages/ClassDetail'
 import Attendance from './pages/Attendance'
+import Reports from './pages/Reports'
+import Settings from './pages/Settings'
 
 function PlaceholderPage({ title }) {
   return (
@@ -102,7 +104,7 @@ function App() {
         element={
           <ProtectedRoute>
             <AppLayout>
-              <PlaceholderPage title="Reports" />
+             <Reports />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -113,7 +115,7 @@ function App() {
         element={
           <ProtectedRoute requireAdmin>
             <AppLayout>
-              <PlaceholderPage title="Settings" />
+              <Settings/>
             </AppLayout>
           </ProtectedRoute>
         }

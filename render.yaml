@@ -1,0 +1,12 @@
+services:
+  - type: worker
+    name: mezmur-telegram-bot
+    runtime: node
+    rootDir: telegram-bot
+    buildCommand: npm install
+    startCommand: node bot.js
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
